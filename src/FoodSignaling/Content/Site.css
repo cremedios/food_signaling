@@ -1,0 +1,12 @@
+﻿#map {
+    width: 100%;
+}
+
+html, body, .container-fluid, #map {
+    height: 100%;
+}
+
+.drag-container {
+    padding-top: 5px;
+    float: left;
+}
