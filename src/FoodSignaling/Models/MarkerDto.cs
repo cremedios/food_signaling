@@ -28,5 +28,14 @@ namespace FoodSignaling.Models
         public double Lat { get; set; }
 
         public double Lng { get; set; }
+
+        public int Votes { get; set; }
+
+        public List<Link> Links { get; set; }
+    }
+
+    public class Link{
+        public string rel { get; set; }
+        public string href { get; set; }
     }
 }

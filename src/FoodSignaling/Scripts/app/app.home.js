@@ -7,9 +7,7 @@
     }
     var initialLocation = new google.maps.LatLng(60, 105);
     var map = new google.maps.Map(mapCanvas, mapOptions);
-    var browserSupportFlag = new Boolean();
 
-    // Try W3C Geolocation (Preferred)
     if (navigator.geolocation) {
         browserSupportFlag = true;
         navigator.geolocation.getCurrentPosition(function (position) {
@@ -19,22 +17,8 @@
             handleNoGeolocation(browserSupportFlag);
         });
     }
-        // Browser doesn't support Geolocation
-    else {
-        browserSupportFlag = false;
-        handleNoGeolocation(browserSupportFlag);
-    }
-
-    function handleNoGeolocation(errorFlag) {
-        if (errorFlag == true) {
-            alert("Geolocation service failed.");
-            initialLocation = newyork;
-        } else {
-            alert("Your browser doesn't support geolocation. We've placed you in Siberia.");
-            initialLocation = siberia;
-        }
-        map.setCenter(initialLocation);
-    }
+    else
+        alert("No geolocation");
 
     var overlay = new google.maps.OverlayView();
     overlay.draw = function () { };
@@ -163,6 +147,8 @@
                 contentString += "<p>deliver food everyday</p>";
             contentString += "<span class='glyphicon glyphicon-time'></span> " + info.TimeHour + ":" + info.TimeMinute;
 
+            contentString += "<a onclick='vote(\"" + info.Id + "\")'>+</a> <a onclick='vote(\"" + info.Id + "\")'> - </a>";
+
             if (currentInfoWindow)
                 currentInfoWindow.close();
 
@@ -173,4 +159,21 @@
         });
         markers.push(marker);
     }
+
+    function vote(id) {
+        for (var i = 0; i < markers.length; i++) {
+            if (markers[i]._Id == id) {
+                var marker = markers[i];
+
+                for (var i = 0; i < marker.links; i++) {
+                    if (marker[i].rel == "upvote") {
+                        $.post(marker[i].href, null, function (result) {
+                            console.log("voting " + id);
+                        });
+                    }
+                }
+            }
+        }
+    }
+
 }

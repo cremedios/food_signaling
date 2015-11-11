@@ -98,18 +98,51 @@
         </div>
     </div>
 
-    <script>
-        var markers = [];
-        var currentInfoWindow = null;
-        var weekdayNames = ["@Html.Raw(string.Join("\",\"", weekDays))"];
-        var apiBasePath = "@Url.Action("Marker", "Api")/";
-    </script>
     @Scripts.Render("~/bundles/app")
     @Scripts.Render("~/bundles/jquery")
     @Scripts.Render("~/bundles/bootstrap")
     <script type="text/javascript" src="https://maps.googleapis.com/maps/api/js?key=AIzaSyAjnn6lhPcRZjsQOI5AXlMzZOZTh6zvZJk&libraries=geometry"></script>
     <script>
-        google.maps.event.addDomListener(window, 'load', initialize);
+        var app = null;
+        google.maps.event.addDomListener(window, 'load', app = new FSAPI("@Url.Action("Marker", "Api")/", document.getElementById('map'), $("#weekdayFilter").val()));
+
+        $("#weekdayFilter").change(function () {
+            app.filterChanged($(this).val());
+        });
+
+        $("#draggable").draggable({
+            helper: 'clone',
+            stop: function (e, ui) {
+                var latLng = app.getMapCoordinatesFromOffset(
+                    (ui.helper.width() / 2) + ui.offset.left,
+                    (ui.helper.height() + ui.offset.top));
+                $("#addMarkerForm input[name='lat']").val(latLng.lat());
+                $("#addMarkerForm input[name='lng']").val(latLng.lng());
+                showMarkerModal();
+            }
+        });
+
+        $("#addMarkerForm").submit(function (form) {
+            event.preventDefault();
+            var data = $("#addMarkerForm").find(":input").serialize();
+
+            app.saveMarker(data, function () {
+                $("#addMarkerModal").modal('hide');
+            }, function (error) {
+                alert(error);
+            });
+        });
+
+        function showMarkerModal() {
+            var date = new Date();
+            $("#timeHour option[value='" + date.getHours() + "']").prop('selected', true);
+            if (date.getMinutes() < 30)
+                $("#timeMinute option[value='0']").prop('selected', true);
+            else
+                $("#timeMinute option[value='30']").prop('selected', true);
+
+            $("#addMarkerModal").modal();
+        }
     </script>
 </body>
 </html>

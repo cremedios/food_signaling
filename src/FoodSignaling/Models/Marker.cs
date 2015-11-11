@@ -22,6 +22,8 @@ namespace FoodSignaling.Models
 
         public int Minute { get; set; }
 
+        public int Votes { get; set; }
+
         public GeoJsonPoint<GeoJson2DGeographicCoordinates> Location { get; set; }
     }
 }

@@ -60,17 +60,51 @@ namespace FoodSignaling.Controllers
             {
                 result.Add(new MarkerDto() //could use a mapper to do this
                 {
+                    Id = marker.Id,
                     Lat = marker.Location.Coordinates.Latitude,
                     Lng = marker.Location.Coordinates.Longitude,
                     Organization = marker.Organization,
                     TimeHour = marker.Hour,
                     TimeMinute = marker.Minute,
-                    WeekDays = marker.WeekDays
+                    WeekDays = marker.WeekDays,
+                    Votes = marker.Votes,
+                    Links = new List<Link> { 
+                        new Link { rel = "upvote", href = string.Format("/api/marker/{0}/upvote", marker.Id) },
+                        new Link { rel = "downvote", href = string.Format("/api/marker/{0}/downvote", marker.Id) }
+                    }
                 });
             }
 
 
             return Json(result);
+        }
+
+        [Route("api/marker/{id}/upvote")]
+        public async Task<IHttpActionResult> UpVote(string id)
+        {
+            var context = new FoodSignalingContext();
+
+            var marker = await context.Markers.FindOneAndUpdateAsync(
+                Builders<Marker>.Filter.Eq(p => p.Id, id),
+                Builders<Marker>.Update.Inc(p => p.Votes, 1));
+
+            return Json(new { Votes = marker.Votes + 1 });
+        }
+
+        [Route("api/marker/{id}/downvote")]
+        public async Task<IHttpActionResult> DownVote(string id)
+        {
+            var context = new FoodSignalingContext();
+
+            var marker = await context.Markers.FindOneAndUpdateAsync(
+                Builders<Marker>.Filter.And(Builders<Marker>.Filter.Eq(p => p.Id, id), Builders<Marker>.Filter.Gt(p => p.Votes, 0)),
+                Builders<Marker>.Update.Inc(p => p.Votes, -1));
+
+            int votes = 0;
+            if (marker != null)
+                votes = marker.Votes - 1;
+
+            return Json(new { Votes = votes });
         }
     }
 }

@@ -12,10 +12,14 @@ namespace FoodSignaling
         {
             bundles.Add(new ScriptBundle("~/bundles/jquery").Include(
                 "~/Scripts/jquery-{version}.js",
-                "~/Scripts/jquery-ui.js"));
+                "~/Scripts/jquery-ui.js",
+                "~/Scripts/mustache.js"));
 
             bundles.Add(new ScriptBundle("~/bundles/app").Include(
-                "~/Scripts/app/app.home.js"));
+                "~/Scripts/app/app.home-{version}.js",
+                "~/Scripts/app/marker.js",
+                "~/Scripts/app/common.js",
+                "~/Scripts/app/mapService.js"));
 
 
             bundles.Add(new ScriptBundle("~/bundles/bootstrap").Include(
